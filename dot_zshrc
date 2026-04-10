@@ -1,0 +1,80 @@
+# ~/.zshrc
+
+## --------------------------------------------------------------------------
+## 1. 基礎環境設定
+## --------------------------------------------------------------------------
+setopt interactivecomments                               # 允許在終端機直接貼上有註解的程式碼
+export PATH="$HOME/.local/bin:$PATH"                     # 優先讀取家目錄下的自訂工具
+export TERM="xterm-256color"                             # 強制開啟 256 色支援，確保主題顯色精準
+export TMOUT=$([[ -n "$TMUX" ]] && echo 0 || echo 36000) # tmux 內不限時，一般連線 10 小時登出
+FPATH="$HOME/.docker/completions:$FPATH"                 # 加入 Docker 補全路徑供 compinit 掃描
+
+## --------------------------------------------------------------------------
+## 2. 環境初始化檢查
+## --------------------------------------------------------------------------
+if ! source "$HOME/.config/zsh/install.zsh"; then
+  print -P "%F{160}[✘] 啟動失敗：環境未就緒。請安裝缺失套件後重開終端機。%f"
+  return 1
+fi
+
+## --------------------------------------------------------------------------
+## 3. 終端機提示字元 (Oh My Posh)
+## --------------------------------------------------------------------------
+eval "$(oh-my-posh init zsh --config "$HOME/.oh-my-posh/theme.omp.json")"
+
+## --------------------------------------------------------------------------
+## 4. 外掛管理器核心 (zinit)
+## --------------------------------------------------------------------------
+source "$HOME/.local/share/zinit/zinit.git/zinit.zsh"
+autoload -Uz _zinit
+(( ${+_comps} )) && _comps[zinit]=_zinit
+
+## --------------------------------------------------------------------------
+## 5. zinit 基礎擴充 (同步載入)
+## --------------------------------------------------------------------------
+zinit light-mode for \
+    zdharma-continuum/zinit-annex-as-monitor \
+    zdharma-continuum/zinit-annex-bin-gem-node \
+    zdharma-continuum/zinit-annex-patch-dl \
+    zdharma-continuum/zinit-annex-rust
+
+## --------------------------------------------------------------------------
+## 6. 功能外掛 (背景載入 Turbo Mode)
+## --------------------------------------------------------------------------
+zinit ice wait'0' lucid
+zinit light-mode for \
+  zsh-users/zsh-completions \
+  zsh-users/zsh-autosuggestions \
+  zdharma-continuum/fast-syntax-highlighting \
+  OMZL::history.zsh \
+  OMZL::key-bindings.zsh \
+  OMZL::completion.zsh \
+  OMZP::vscode \
+  OMZP::sudo
+
+# 歷史紀錄子字串搜尋：需在插件載入後綁定按鍵
+zinit ice wait'0' lucid atload'
+  bindkey "^[[A" history-substring-search-up
+  bindkey "^[[B" history-substring-search-down'
+zinit light zsh-users/zsh-history-substring-search
+
+## --------------------------------------------------------------------------
+## 7. 啟動補全引擎 (compinit)
+## --------------------------------------------------------------------------
+readonly ZCOMPDUMP_PATH="$HOME/.cache/.zcompdump"
+[[ -d "${ZCOMPDUMP_PATH:h}" ]] || mkdir -p "${ZCOMPDUMP_PATH:h}"
+
+autoload -Uz compinit
+compinit -d "${ZCOMPDUMP_PATH}"
+
+## --------------------------------------------------------------------------
+## 8. 自動補全行為設定
+## --------------------------------------------------------------------------
+setopt AUTO_LIST     # 有多個選項時自動列出清單
+setopt AUTO_MENU     # 連按 Tab 可在選單中輪流切換
+setopt MENU_COMPLETE # 按下 Tab 直接填入第一個候選選項
+
+## --------------------------------------------------------------------------
+## 7. 自定義別名 (Aliases)
+## --------------------------------------------------------------------------
+alias ll='LC_COLLATE=C ls -alhF --time-style=long-iso --color=auto'
