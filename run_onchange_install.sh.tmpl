@@ -1,0 +1,7 @@
+{{- if eq .chezmoi.os "linux" -}}
+{{- if eq .chezmoi.osRelease.id "debian" -}}
+#!/bin/bash
+apt update && \
+apt install -y sudo curl zsh git unzip tmux vim htop jq
+{{- end -}} {{/* if eq .chezmoi.osRelease.id "debian" */}}
+{{- end -}} {{/* if eq .chezmoi.os "linux" */}}
