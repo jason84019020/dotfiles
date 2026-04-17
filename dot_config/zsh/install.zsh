@@ -33,7 +33,7 @@ fi
 if ! command -v oh-my-posh &> /dev/null; then
   print -P "${MSG_INFO} 正在安裝 oh-my-posh..."
   command mkdir -p "$HOME/.local/bin"
-  command curl -s https://ohmyposh.dev/install.sh | bash -s -- -d $HOME/.local/bin && \
+  command curl -s https://ohmyposh.dev/install.sh | sh -s -- -d $HOME/.local/bin && \
     { print -P "${MSG_SUCCESS} oh-my-posh 安裝成功"; } || \
     { print -P "${MSG_ERROR} oh-my-posh 安裝失敗"; return 1; }
 fi

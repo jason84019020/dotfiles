@@ -1,7 +1,18 @@
-{{- if eq .chezmoi.os "linux" -}}
-{{- if eq .chezmoi.osRelease.id "debian" -}}
-#!/bin/bash
+{{ if eq .chezmoi.os "linux" -}}
+#!{{ lookPath "sh" }}
+
+{{ if eq .chezmoi.osRelease.id "alpine" -}}
+sudo apk update && \
+sudo apk add --no-cache curl zsh git unzip tmux vim htop jq shadow
+{{ end -}} {{/* if eq .chezmoi.osRelease.id "debian" */}}
+
+{{ if eq .chezmoi.osRelease.id "debian" -}}
 sudo apt update && \
 sudo apt install -y curl zsh git unzip tmux vim htop jq
-{{- end -}} {{/* if eq .chezmoi.osRelease.id "debian" */}}
-{{- end -}} {{/* if eq .chezmoi.os "linux" */}}
+{{ end -}} {{/* if eq .chezmoi.osRelease.id "debian" */}}
+
+{{ if eq .chezmoi.osRelease.id "arch" -}}
+sudo pacman -Syu --needed --noconfirm curl zsh git unzip tmux vim htop jq
+{{ end -}} {{/* if eq .chezmoi.osRelease.id "arch" */}}
+
+{{ end -}} {{/* if eq .chezmoi.os "linux" */}}
